@@ -33,13 +33,15 @@ Refer some idea from [duktape.node](https://github.com/ndob/duktape-node).
 ## Building manually and running tests
 > So far enabled build on Macos only
 
-``` build
+build
+```
 git clone --recurse-submodules git@github.com:ruffchain/RuffVM.git
 cd RuffVM
 npm install
 ```
 
-```build manually
+build manually
+```
 node-gyp configure
 node-gyp build
 ```
