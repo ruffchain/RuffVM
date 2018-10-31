@@ -1,0 +1,6 @@
+[submodule "lib/jerryscript"]
+	path = lib/jerryscript
+	url = https://github.com/jerryscript-project/jerryscript.git
+[submodule "lib/PloyM"]
+	path = lib/PolyM
+	url = https://github.com/khuttun/PolyM.git
