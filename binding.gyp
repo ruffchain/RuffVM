@@ -41,14 +41,14 @@
             ],
             "conditions": [
                 ["OS=='mac'", {
-                    "cflags": [
+                    "cflags_cc": [
                         "-O2",
                         "-std=c++1y",
                         "-Weffc++",
                         "-pedantic",
                         "-Wall",
                         "-fstrict-aliasing",
-                        "-fomit-frame-pointer"
+                        "-fomit-frame-pointer",
                     ],
                     "libraries": [
                         "-L/usr/local/lib"

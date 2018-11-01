@@ -84,7 +84,13 @@ callbackHandler(const jerry_value_t function_obj,
         if (func_name.errorCode == 0) {
             std::string callbackName(func_name.value);
             auto vmPacket = bridge::VMPacket();
-			vmPacket.from(args_p[0]);
+            if (args_cnt == 1) {
+                vmPacket.from(args_p[0]);
+            } else {
+                jerry_value_t undefined_value = jerry_create_undefined();
+                vmPacket.from(undefined_value);
+                jerry_release_value(undefined_value);
+            }
 			if (vmPacket.type() == bridge::PacketFailToParse) {
 				ret_val = jerry_create_undefined();
 				goto clean;
