@@ -60,6 +60,16 @@
                             '-stdlib=libc++'
                         ]
                     }
+                },
+                "OS=='linux'", {
+                    "cflags_cc": [
+                        "-O2",
+                        "-std=c++14",
+                        "-pedantic",
+                        "-Wall",
+                        "-fstrict-aliasing",
+                        "-fomit-frame-pointer"
+                    ]
                 }]
             ],
         },

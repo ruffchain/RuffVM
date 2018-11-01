@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"bindings": "1.1.1",
-		"node-gyp": "3.0.2"
+		"node-gyp": "^3.0.2"
 	},
 	"devDependencies": {
 		"mocha": "^5.2.0",

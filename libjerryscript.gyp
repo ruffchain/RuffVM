@@ -181,14 +181,25 @@
                         "-std=c99",
                         "-pedantic",
                         "-fno-builtin",
-                        "-fno-stack-protector"
+                        "-fno-stack-protector",
                         "-Wall",
                         "-Os",
                     ],
                     "xcode_settings": {
                         "MACOSX_DEPLOYMENT_TARGET": "10.13"
                     }
-                }]
+                },
+                "OS=='linux'", {
+                    "cflags": [
+                        "-std=c99",
+                        "-pedantic",
+                        "-fno-builtin",
+                        "-fno-stack-protector",
+                        "-Wall",
+                        "-Os",
+                    ],
+                }
+                ]
             ],
         },
     ],
