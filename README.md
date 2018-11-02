@@ -35,7 +35,7 @@ Refer some idea from [duktape.node](https://github.com/ndob/duktape-node).
 
 build
 ```
-git clone --recurse-submodules git@github.com:ruffchain/RuffVM.git
+git clone --recurse-submodules https://github.com/ruffchain/RuffVM.git
 cd RuffVM
 npm install
 ```
