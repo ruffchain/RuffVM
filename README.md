@@ -171,14 +171,14 @@ For more example please refer to test/basic.test.js
 
 ## Function export to VM from Node.js
 * function hostApi(vmResolve, parmFromVM)
-  * vmResolve: resolve handle to resolve *Resolved* Value on Node.js, just ignore this handle if the return value is not **promise**
+  * vmResolve: resolve handler to resolve *Resolved* Value on Node.js, just ignore this handler if the return value is not **promise**
   * paramFromVM: parameter specified from VM
 
-## Who is using this project
+## Main usage
 
 `ruffchain` use ruffvm as its smart contract execute engine, provide the ability for user develop their smart contract by JavaScript.
 
-## What is the difference between Node's vm and ruffvm-node
+## Difference from Node's vm
 
 Following code will escape node vm `sandbox` and do exit on host
 
@@ -188,16 +188,16 @@ vm.runInNewContext('this.constructor.constructor("return process")().exit()');
 console.log('Never gets executed.');
 ```
 
-## what is the different between duktape.node and ruffvm-node
+## Difference from duktape.node
 
-ruffvm-node support set both CPU and Memory limitation whereas duktape.node do not support
+ruffvm-node support set limit on CPU and Memory comparing to duktape.node
 
-## ToDo
+## To do list
 
 * Enable build on Linux and Windows
 * Add node.js `vm` module compatible API
 * Add SharedArrayBuffer support (ES2017)
 * Evaluate `XS` JavaScript Engine
 
-## Known limitation
+## Known improvements
 Does not support multiple instance of vm run simultaneously. Communication between VM and Host is not optimized for heavily usage scenario.
