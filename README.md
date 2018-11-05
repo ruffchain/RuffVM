@@ -1,37 +1,35 @@
 RuffVM
 ==========
 
-RuffVM is a small embeddable VM provides security, isolate execution environment for run DApp(Decentralized application).
-It provides resource(e.g Memory and CPU) control ability to limit resource could be consumed by DApp.
-RuffVM aim to provide a Uniform Blockchain DApp runtime, DApp developer could develop DApp by a user friendly programming language JavaScript(but not only limit to it).
-RuffVM provide modules build-in,plug-in mechanism for Blockchain developer to customize DApp runtime depends on their need, these modules expected to be shareable across difference Blockchain platform(e.g EOS,Ethereum,ruffchain).
-For DApp developer that means their DApp could be ported to different Blockchain platform smoothly.
+RuffVM is a light-weight VM environment designed for DApps(Decentralized applications). It provides secure, isolated execution environment as well as resource control (e.g Memory and CPU) for Dapps. It lowers the barrier of Blockchain application development by significant amount via JavaScript based abstraction (But not limited to JS).
+
+RuffVM's build-in,plug-in mechanism allows developers to customize DApp runtime depends on their need, these modules will be completely independent to a public chain base and will be compatible with any Blockchain platforms(e.g EOS,Ethereum,ruffchain). 
 
 ## RoadMap
-### So far
-* 0.1 Implement on Node.js
+### Present
+* 0.1 Implementation on Node.js
 
 ### In progress
-* Provide build-in modules
+* Build-in modules
 * Standerlize modules build-in, plug-in mechanism
 
-### The future
-* verify and optimize on ruffchain blockchain
-* splitting out ruffvm-core into separate repo
-* ported to EOS
-* ported to Ethereum
+### Future release
+* Verification and optimization on ruffchain blockchain
+* Split out ruffvm-core into separate repo
+* Port to EOS
+* Port to Ethereum
 * DApp Module registry
 
 RuffVM-Node
 =========
 
-RuffVM integration for node.js, aim at providing simple usable, security sandbox for run untrusted javascript code in nodejs,
-meantime provides resource control abilities(e.g. cpu time and memory).
+RuffVM integration for node.js, aim to provide usable, secure sandbox in order to run untrusted javascript code in nodejs,
+Resource control abilities supported in this version (e.g. cpu time and memory).
 RuffVM leverage jerryscript(a lightweight JavaScript engine) as javascript runtime, it is isolated with Node V8 engine naturally.
 Refer some idea from [duktape.node](https://github.com/ndob/duktape-node).
 
 ## Building manually and running tests
-> So far enabled build on Macos only
+> Currently enabled build on Macos only
 
 build
 ```
@@ -169,7 +167,7 @@ Host return Resolved `Promised` value to VM
     });
 
 ```
-more Example please refer to test/basic.test.js
+For more example please refer to test/basic.test.js
 
 ## Function export to VM from Node.js
 * function hostApi(vmResolve, parmFromVM)
