@@ -7,8 +7,8 @@ console.log(x.isEqualTo(y) && y.isEqualTo(z) && x.isEqualTo(z));
 console.log(z);
 
 function hello() {
-    console.log('hello world');
-    return helloInHost();
+    console.log('hello world', z.toString());
+    return helloInHost(z.toString());
 }
 
 global.helloInVm = hello;

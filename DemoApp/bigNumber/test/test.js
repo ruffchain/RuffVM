@@ -1,6 +1,6 @@
 const assert = require('assert');
 const vm = require('../../../index.js');
-
+const BigNumber = require('bignumber.js');
 function bufferToArrayBuffer(b ){
     return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
 }
@@ -11,7 +11,9 @@ describe('App Test', function() {
 
         function apiFunction(resolve, param) {
             isTriggered = true;
-            console.log('in host');
+            var number = BigNumber(param);
+            var expect = BigNumber(123.4567);
+            assert(number.isEqualTo(expect));
             return true;
         }
         const fs = require('fs');
