@@ -41,7 +41,7 @@ void CallbackCache::addCallback(jerry_context_t* ctx, const std::string& functio
 
 std::unique_ptr<bridge::VMPacket> CallbackCache::doCallbackToV8(jerry_context_t* ctx,
 										  const std::string& callbackName,
-										  const bridge::VMPacket& parameter)
+										  const bridge::VMPackets& parameter)
 {
     auto context = m_callbackCache.find(ctx);
     if(context != m_callbackCache.end())

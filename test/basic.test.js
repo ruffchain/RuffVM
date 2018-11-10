@@ -238,5 +238,38 @@ describe('ruff vm basic', function() {
             done(assert(err === false && ret === true));
         });
     });
+
+      it ('could pass more than 1 param to Host API', (done) => {
+          let isTriggered = false;
+
+          function apiFunction(resolve, param1, param2) {
+              isTriggered = true;
+              const u8 = new Uint8Array(param1, 0, param1.byteLength);
+              assert(u8.length === 20);
+              assert(u8[0] = 1 && u8[1] === 2);
+
+              assert(param2 === 1234);
+              return true;
+          }
+          var contextStr =`
+            function helloFun(parameterString) {
+              var buf = new Uint8Array(20);
+              buf[0] = 1;
+              buf[1] = 2;
+              return hello(buf.buffer, 1234);
+            }
+        `;
+          var apiObject = {
+              hello: apiFunction
+          };
+
+          const contextAB = bufferToArrayBuffer(Buffer.from(contextStr));
+          const contextU8Buf = new Uint8Array(contextAB, 0, contextAB.byteLength);
+          vm.run('helloFun("ruffVM")', contextU8Buf, apiObject,  {cpuCount:1, memSizeKB:200}, (err, ret) => {
+              assert(isTriggered);
+              done(assert(err === false && ret === true));
+          });
+      });
+
   });
 });

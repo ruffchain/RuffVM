@@ -19,7 +19,7 @@ public:
     void addCallback(jerry_context_t* ctx, const std::string& functionName, ruffvm::Callback callbackFunc);
     std::unique_ptr<bridge::VMPacket> doCallbackToV8(jerry_context_t* ctx,
                                                      const std::string& callbackName,
-                                                     const bridge::VMPacket& parameter);
+                                                     const bridge::VMPackets& parameter);
 
 private:
     /*

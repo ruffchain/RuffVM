@@ -4,7 +4,6 @@
 #include <string>
 #include "bridge.h"
 namespace ruffvm {
-
-typedef std::function<std::unique_ptr<bridge::VMPacket>(const bridge::VMPacket&)> Callback;
+typedef std::function<std::unique_ptr<bridge::VMPacket>(const bridge::VMPackets&)> Callback;
 
 } // namespace ruffvm

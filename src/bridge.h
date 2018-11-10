@@ -96,4 +96,6 @@ namespace bridge {
             bool  isTrue;
         }m_variantValue;
     };
+
+    typedef std::vector<bridge::VMPacket> VMPackets;
 }

@@ -77,26 +77,32 @@ callbackHandler(const jerry_value_t function_obj,
     Result func_name;
 
     if (jerry_value_is_string(prop_value)) {
-
+        bridge::VMPackets params;
         func_name = ruffvm_jerry_string_value_to_string(prop_value,
                                                         (const char*)str_buf_p,
                                                         RUFFVM_MAX_FUNC_NAME_SIZE);
         if (func_name.errorCode == 0) {
             std::string callbackName(func_name.value);
-            auto vmPacket = bridge::VMPacket();
-            if (args_cnt == 1) {
-                vmPacket.from(args_p[0]);
+            if (args_cnt > 0) {
+                for (jerry_length_t index = 0; index < args_cnt; index++) {
+                    auto vmPacket = bridge::VMPacket();
+                    vmPacket.from(args_p[index]);
+                    if (vmPacket.type() == bridge::PacketFailToParse) {
+				        ret_val = jerry_create_undefined();
+				        goto clean;
+			        }
+                    params.push_back(vmPacket);
+                }
             } else {
+                auto vmPacket = bridge::VMPacket();
                 jerry_value_t undefined_value = jerry_create_undefined();
                 vmPacket.from(undefined_value);
                 jerry_release_value(undefined_value);
+                params.push_back(vmPacket);
             }
-			if (vmPacket.type() == bridge::PacketFailToParse) {
-				ret_val = jerry_create_undefined();
-				goto clean;
-			}
+
             jerry_context_t *ctx = jerry_port_get_current_context();
-            auto pVMPacket = cbCache.doCallbackToV8(ctx, callbackName, vmPacket);
+            auto pVMPacket = cbCache.doCallbackToV8(ctx, callbackName, params);
             if (pVMPacket) {
                 ret_val = pVMPacket->toJerryValue();
             } else {

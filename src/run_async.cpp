@@ -78,7 +78,7 @@ struct APICallbackSignaling
 
     APICallbackSignaling(const PersistentCallback& cb,
 						 ruffvm::VMAddOn* pVmAddOn,
-						 const bridge::VMPacket& parameter,
+						 const bridge::VMPackets& parameter,
                          std::unique_ptr<bridge::VMPacket> pRetVal,
 						 uv_async_cb cbFunc):
      callback(cb)
@@ -106,7 +106,7 @@ struct APICallbackSignaling
     APICallbackSignaling& operator=(const APICallbackSignaling&) = delete;
     const PersistentCallback& callback;
     ruffvm::VMAddOn* pVmAddOn;
-    const bridge::VMPacket& parameter;
+    const bridge::VMPackets& parameter;
     std::unique_ptr<bridge::VMPacket> pRetVal;
 
     bool done;
@@ -131,7 +131,7 @@ struct CallbackHelper
         m_persistentApiCallbackFunc.Reset();
     }
 
-    std::unique_ptr<bridge::VMPacket> operator()(const bridge::VMPacket& param)
+    std::unique_ptr<bridge::VMPacket> operator()(const bridge::VMPackets& param)
     {
         // We're on not on libuv/V8 main thread. Signal main to run
         // callback function and wait for an answer.
@@ -180,25 +180,29 @@ void resolveFunction(const FunctionCallbackInfo<v8::Value>& info) {
     return;
 }
 
+#define RUFFVM_MAX_PARAM_TOV8 8
 NAN_ADDON_UV_ASYNC_CB(callV8FunctionOnMainThread) {
     auto signalData = static_cast<APICallbackSignaling*> (handle->data);
     uv_mutex_lock(&signalData->mutex);
 
     Nan::HandleScope scope;
-    Local<Value> argv[2];
-
+    Local<Value> argv[RUFFVM_MAX_PARAM_TOV8];
     Isolate *isolate = Isolate::GetCurrent();
 
     Local<External> external = External::New(isolate, signalData->pVmAddOn);
     Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, resolveFunction, external);
-
+    int argc = 1;
     argv[0] = tpl->GetFunction();
-	const bridge::VMPacket& vmPacket = signalData->parameter;
-    argv[1] = vmPacket.toV8Value(isolate);
+
+    for (auto iter = signalData->parameter.begin();
+            iter != signalData->parameter.end() && argc < RUFFVM_MAX_PARAM_TOV8; iter++,argc++) {
+	    const bridge::VMPacket& vmPacket = *iter;
+        argv[argc] = vmPacket.toV8Value(isolate);
+    }
 
     Nan::TryCatch try_catch;
     auto callbackHandle = Nan::New<Function>(signalData->callback);
-    auto retVal = callbackHandle->Call(Nan::GetCurrentContext()->Global(), 2, argv);
+    auto retVal = callbackHandle->Call(Nan::GetCurrentContext()->Global(), argc, argv);
 
     if (try_catch.HasCaught()) {
         String::Utf8Value stack_trace(try_catch.StackTrace().ToLocalChecked());
