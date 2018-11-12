@@ -3,7 +3,7 @@ RuffVM
 
 RuffVM is a light-weight VM environment designed for DApps(Decentralized applications). It provides secure, isolated execution environment as well as resource control (e.g Memory and CPU) for Dapps. It lowers the barrier of Blockchain application development by significant amount via JavaScript based abstraction (But not limited to JS).
 
-RuffVM's build-in,plug-in mechanism allows developers to customize DApp runtime depends on their need, these modules will be completely independent to a public chain base and will be compatible with any Blockchain platforms(e.g EOS,Ethereum,ruffchain). 
+RuffVM's build-in,plug-in mechanism allows developers to customize DApp runtime depends on their need, these modules will be completely independent to a public chain base and will be compatible with any Blockchain platforms(e.g EOS,Ethereum,ruffchain).
 
 ## RoadMap
 ### Present
@@ -194,7 +194,8 @@ ruffvm-node support set limit on CPU and Memory comparing to duktape.node
 
 ## To do list
 
-* Enable build on Linux and Windows
+* ~~Enable build on Linux~~
+* Enable build on Windows
 * Add node.js `vm` module compatible API
 * Add SharedArrayBuffer support (ES2017)
 * Evaluate `XS` JavaScript Engine
