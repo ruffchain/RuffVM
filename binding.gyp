@@ -27,17 +27,19 @@
                 "lib/jerryscript/jerry-port/default/include/",
                 "lib/jerryscript/jerry-ext/include/",
                 "lib/PolyM",
+                "lib/incbin",
                 "src",
                 "<!(node -e \"require('nan')\")"
             ],
             "sources": [
                 "src/ruffvm_main.cpp",
                 "src/ruffvm.cpp",
+                "src/snapshot.cpp",
                 "src/callbackcache.cpp",
                 "src/run_async.cpp",
                 "src/bridge.cpp",
                 "lib/PolyM/Msg.cpp",
-                "lib/PolyM/Queue.cpp",
+                "lib/PolyM/Queue.cpp"
             ],
             "conditions": [
                 ["OS=='mac'", {

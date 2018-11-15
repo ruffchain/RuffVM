@@ -4,3 +4,6 @@
 [submodule "lib/PloyM"]
 	path = lib/PolyM
 	url = https://github.com/khuttun/PolyM.git
+[submodule "lib/incbin"]
+	path = lib/incbin
+	url = https://github.com/graphitemaster/incbin.git

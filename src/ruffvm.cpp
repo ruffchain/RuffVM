@@ -2,6 +2,7 @@
 
 #include "ruffvm.h"
 #include "bridge.h"
+#include "snapshot.h"
 #include "callbackcache.h"
 #include "jerryscript.h"
 #include "jerryscript-port.h"
@@ -214,6 +215,7 @@ RuffVM::RuffVM(uint32_t cpuCount, uint32_t memSizeKB)
     if (m_cpuCount != 0xFFFFFFFF) {
         jerry_set_vm_exec_stop_callback (vm_exec_stop_callback, &m_cpuCount, 64);
     }
+    snapshotLoad();
 }
 
 RuffVM::~RuffVM()
@@ -256,3 +258,4 @@ void RuffVM::registerCallback(const std::string& functionName, Callback callback
 }
 
 } // namespace ruffvm
+#include "bridge.h"
