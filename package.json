@@ -1,25 +1,25 @@
 {
-	"name": "ruff-vm",
-	"author": "ruff",
-	"description": "Ruff VM",
-	"version": "0.1.0",
-	"main": "./index.js",
-	"license": "MIT",
-	"repository": {
-		"type": "git"
-	},
-	"dependencies": {
-		"bindings": "1.1.1",
-		"node-gyp": "^3.0.2"
-	},
-	"devDependencies": {
-		"mocha": "^5.2.0",
-		"nan": "^2.11.0"
-	},
-	"engines": {
-		"node": ">=8.10.0"
-	},
-	"scripts": {
-		"test": "./node_modules/.bin/mocha test/basic.test.js --reporter spec --colors"
-	}
+  "name": "ruff-vm",
+  "author": "ruff",
+  "description": "Ruff VM",
+  "version": "0.1.0",
+  "main": "./index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git"
+  },
+  "dependencies": {
+    "bindings": "1.1.1",
+    "node-gyp": "^3.0.2"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "nan": "^2.11.0"
+  },
+  "engines": {
+    "node": ">=8.10.0"
+  },
+  "scripts": {
+    "test": "mocha  test/*.test.js --reporter spec --colors"
+  }
 }
