@@ -85,87 +85,83 @@ Host return no `Promised` value to VM
 
 
 ```javascript
+const assert = require('assert')
+const { createScript } = require('ruffvm')
 
-    const assert = require('assert');
-    const vm = require('ruffvm');
+const code = `
+  function helloFun(parameterString) {
+    var buf = new Uint8Array(20)
+    buf[0] = 1
+    buf[1] = 2
+    return hello(buf.buffer)
+  }`
 
-    let isTriggered = false;
-    function bufferToArrayBuffer(b ){
-        return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
-    }
+let isTriggered = false
+const sandbox = {
+  hello: function(resolve, param) {
+    isTriggered = true
+    const u8 = new Uint8Array(param, 0, param.byteLength)
+    assert(u8.length === 20)
+    assert((u8[0] = 1 && u8[1] === 2))
+    return true
+  }
+}
 
-    function apiFunction(resolve, param) {
-        isTriggered = true;
-        const u8 = new Uint8Array(param, 0, param.byteLength);
-        assert(u8.length === 20);
-        assert(u8[0] = 1 && u8[1] === 2);
-        return true;
-    }
-    var contextStr = " \
-    function helloFun(parameterString) {  \
-      var buf = new Uint8Array(20);       \
-      buf[0] = 1;                         \
-      buf[1] = 2;                         \
-      return hello(buf.buffer);           \
-    }                                     \
-    ";
-    var apiObject = {
-        hello: apiFunction
-    };
-
-    const contextAB = bufferToArrayBuffer(Buffer.from(contextStr));
-    const contextU8Buf = new Uint8Array(contextAB, 0, contextAB.byteLength);
-    vm.run('helloFun("ruffVM")', contextU8Buf, apiObject,  {cpuCount:1, memSizeKB:200}, (err, ret) => {
-        assert(isTriggered);
-        assert(err === false && ret === true);
-    });
-
+;(async () => {
+  const res = await createScript(code)
+    .setUserCode(`helloFun("ruffVM")`)
+    .setSandbox(sandbox)
+    .setOption({ cpuCount: 1, memSizeKB: 200 })
+    .runAsync()
+  assert(isTriggered)
+  assert(res === true)
+})()
 ```
 
 Host return Resolved `Promised` value to VM
 
 
 ```javascript
+const assert = require('assert')
+const vm = require('ruffvm')
 
-    const assert = require('assert');
-    const vm = require('ruffvm');
+function bufferToArrayBuffer(b ){
+  return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
+}
 
-    var apiFunction = function(vmResolve, name) {
-        var ret = new Promise(function(resolve){
-            let ab1 = bufferToArrayBuffer(Buffer.from('this is hostapi test'));
-            const u8 = new Uint8Array(ab1, 0, ab1.byteLength);
-            setTimeout(() => {
-                vmResolve(u8); // send resolved value to VM
-                resolve();
-            }, 20);
-        });
+const code = `
+  function helloFun(parameterString) {
+    var buf = new Uint8Array(20)
+    buf[0] = 1
+    buf[1] = 2
+    return hello(buf.buffer)
+  }`
 
-        return ret;
-    }
+const sandbox = {
+  hello: function(vmResolve, name) {
+    return new Promise(function(resolve) {
+      let ab1 = bufferToArrayBuffer(Buffer.from('this is hostapi test'))
+      const u8 = new Uint8Array(ab1, 0, ab1.byteLength)
+      setTimeout(() => {
+        vmResolve(u8) // send resolved value to VM
+        resolve()
+      }, 20)
+    })
+  }
+}
 
-    var contextStr = " \
-    function helloFun(parameterString) {  \
-      var buf = new Uint8Array(20);       \
-      buf[0] = 1;                         \
-      buf[1] = 2;                         \
-      return hello(buf.buffer);           \
-    }                                     \
-    ";
-    var apiObject = {
-        hello: apiFunction
-    };
+;(async () => {
+  const res = await createScript(code)
+    .setUserCode(`helloFun("ruffVM")`)
+    .setSandbox(sandbox)
+    .setOption({ cpuCount: 1, memSizeKB: 200 })
+    .runAsync()
 
-    const contextAB = bufferToArrayBuffer(Buffer.from(contextStr));
-    const contextU8Buf = new Uint8Array(contextAB, 0, contextAB.byteLength);
-    vm.run('helloFun("ruffVM")', contextU8Buf, apiObject,  {cpuCount:1, memSizeKB:200}, (err, ret) => {
-        assert(isTriggered);
-        assert(err === false);
-        var expectBuffer = bufferToArrayBuffer(Buffer.from('this is hostapi test'));
-        var expectU8 = new Uint8Array(expectBuffer, 0, expectBuffer.byteLength);
-        var retU8 = new Uint8Array(ret, 0, ret.byteLength);
-        assert.deepStrictEqual(retU8, expectU8);
-    });
-
+  const expectBuffer = bufferToArrayBuffer(Buffer.from('this is hostapi test'))
+  const expectU8 = new Uint8Array(expectBuffer, 0, expectBuffer.byteLength)
+  const resU8 = new Uint8Array(res, 0, res.byteLength)
+  assert.deepStrictEqual(resU8, expectU8)
+})()
 ```
 For more example please refer to test/basic.test.js
 
