@@ -20,6 +20,6 @@
   "scripts": {
     "start": "npm run build && npm run test",
     "build": "webpack --config .webpack.config.js",
-    "test": "mocha test/test.js --reporter spec --colors"
+    "test": "mocha test/*test.js --reporter spec --colors"
   }
 }
