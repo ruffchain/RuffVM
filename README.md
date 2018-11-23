@@ -58,26 +58,29 @@ npm run test
 
 ## API
 
-### run(script, context, apiTable, resourceCtrl, callback)
-**Description**
+### Class: Script
+#### new Script(code)
+* `code` \<string> code to compile and evaluate in VM
+* Returns: \<Script> 
+#### script.setUserCode(userCode)
+* `userCode` \<string> script to run in VM after `code` 
+* Returns: \<Script> 
+#### script.setOption(options)
+* `options`
+    * `cpuCount` \<number> cpu count to limit
+    * `memSizeKB` \<number> memory size in KB
+* Returns: \<Script> 
+#### script.setSandbox(sandbox)
+* `sandbox` \<Object>  will be the global object in vm
+* Returns: \<Script> 
+#### script.runAsync()
+* Returns: \<Promise> 
+  * `resolve` return value from script
+  * `reject` error status (boolean)
 
-Runs a single script on ruffvm and returns error status and return value to callback.
-
-**Parameters**
-
-* script: a script to run in `context`
-* context: to compile and evaluate `script` in
-* apiTable: API table for script and context
-  * properties:
-    * key: name for function
-    * value: function to call
-* resourceCtrl: resource control params
-  * properties:
-    * cpuTime: cpu count to limit
-    * memSizeKB: memory size in KB
-* callback: function with signature `function(error, returnValue)`
-  * error: error status (boolean)
-  * returnValue: return value from script or error in case of an error
+### createScript(code)
+* `code` \<string> code to compile and evaluate in VM
+* Returns: \<Script> 
 
 **Example**
 
