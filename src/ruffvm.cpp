@@ -86,24 +86,29 @@ callbackHandler(const jerry_value_t function_obj,
             std::string callbackName(func_name.value);
             if (args_cnt > 0) {
                 for (jerry_length_t index = 0; index < args_cnt; index++) {
-                    auto vmPacket = bridge::VMPacket();
-                    vmPacket.from(args_p[index]);
-                    if (vmPacket.type() == bridge::PacketFailToParse) {
+                    auto pPacket = new bridge::VMPacket();
+                    pPacket->from(args_p[index]);
+                    if (pPacket->type() == bridge::PacketFailToParse) {
 				        ret_val = jerry_create_undefined();
 				        goto clean;
 			        }
-                    params.push_back(vmPacket);
+                    params.push_back(pPacket);
                 }
             } else {
-                auto vmPacket = bridge::VMPacket();
+                auto pPacket = new bridge::VMPacket();
                 jerry_value_t undefined_value = jerry_create_undefined();
-                vmPacket.from(undefined_value);
+                pPacket->from(undefined_value);
                 jerry_release_value(undefined_value);
-                params.push_back(vmPacket);
+                params.push_back(pPacket);
             }
 
             jerry_context_t *ctx = jerry_port_get_current_context();
             auto pVMPacket = cbCache.doCallbackToV8(ctx, callbackName, params);
+            for (auto iter = params.begin(); iter != params.end(); iter++) {
+	            delete(*iter);
+                *iter = nullptr;
+            }
+
             if (pVMPacket) {
                 ret_val = pVMPacket->toJerryValue();
             } else {

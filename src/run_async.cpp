@@ -196,8 +196,8 @@ NAN_ADDON_UV_ASYNC_CB(callV8FunctionOnMainThread) {
 
     for (auto iter = signalData->parameter.begin();
             iter != signalData->parameter.end() && argc < RUFFVM_MAX_PARAM_TOV8; iter++,argc++) {
-	    const bridge::VMPacket& vmPacket = *iter;
-        argv[argc] = vmPacket.toV8Value(isolate);
+	    const bridge::VMPacket* pVmPacket = *iter;
+        argv[argc] = pVmPacket->toV8Value(isolate);
     }
 
     Nan::TryCatch try_catch;

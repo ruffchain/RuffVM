@@ -97,5 +97,5 @@ namespace bridge {
         }m_variantValue;
     };
 
-    typedef std::vector<bridge::VMPacket> VMPackets;
+    typedef std::vector<bridge::VMPacket*> VMPackets;
 }
