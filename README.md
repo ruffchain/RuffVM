@@ -61,26 +61,26 @@ npm run test
 ### Class: Script
 #### new Script(code)
 * `code` \<string> code to compile and evaluate in VM
-* Returns: \<Script> 
+* Returns: \<Script>
 #### script.setUserCode(userCode)
-* `userCode` \<string> script to run in VM after `code` 
-* Returns: \<Script> 
+* `userCode` \<string> script to run in VM after `code`
+* Returns: \<Script>
 #### script.setOption(options)
 * `options`
     * `cpuCount` \<number> cpu count to limit
     * `memSizeKB` \<number> memory size in KB
-* Returns: \<Script> 
+* Returns: \<Script>
 #### script.setSandbox(sandbox)
 * `sandbox` \<Object>  will be the global object in vm
-* Returns: \<Script> 
+* Returns: \<Script>
 #### script.runAsync()
-* Returns: \<Promise> 
+* Returns: \<Promise>
   * `resolve` return value from script
   * `reject` error status (boolean)
 
 ### createScript(code)
 * `code` \<string> code to compile and evaluate in VM
-* Returns: \<Script> 
+* Returns: \<Script>
 
 **Example**
 
@@ -194,8 +194,8 @@ ruffvm-node support set limit on CPU and Memory comparing to duktape.node
 ## To do list
 
 * ~~Enable build on Linux~~
+* ~~Add chain style API~~
 * Enable build on Windows
-* Add node.js `vm` module compatible API
 * Add SharedArrayBuffer support (ES2017)
 * Evaluate `XS` JavaScript Engine
 
