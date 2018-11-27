@@ -104,6 +104,7 @@ callbackHandler(const jerry_value_t function_obj,
 
             jerry_context_t *ctx = jerry_port_get_current_context();
             auto pVMPacket = cbCache.doCallbackToV8(ctx, callbackName, params);
+
             for (auto iter = params.begin(); iter != params.end(); iter++) {
 	            delete(*iter);
                 *iter = nullptr;
@@ -263,4 +264,3 @@ void RuffVM::registerCallback(const std::string& functionName, Callback callback
 }
 
 } // namespace ruffvm
-#include "bridge.h"
