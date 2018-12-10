@@ -13,4 +13,15 @@ describe('Context', function() {
         done()
         })
     })
+  it('could throw error of UTF-8 in context', (done) => {
+      createScript()
+      .setUserCode('throw "错误"')
+      .setOption({ cpuCount: 1, memSizeKB: 200 })
+      .runAsync()
+      .then()
+      .catch((err) => {
+        done(assert.equal(err, 'Error: 错误', 'VM should throw error'))
+        })
+    })
+
 })

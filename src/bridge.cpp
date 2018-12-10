@@ -21,12 +21,12 @@ PacketType VMPacket::fromJerryError(jerry_value_t error_value) {
             jerry_value_t item_val = jerry_get_property_by_index (backtrace_val, i);
 
             if (!jerry_value_is_error (item_val) && jerry_value_is_string (item_val)) {
-                jerry_size_t str_size = jerry_get_string_size (item_val);
+                jerry_size_t str_size = jerry_get_utf8_string_size (item_val);
 
                 if (str_size >= m_capacity) {
                     std::cout << "Backtrace string too long]\n" << std::endl;
                 } else {
-                    jerry_size_t string_end = jerry_string_to_char_buffer (item_val, m_pData, str_size);
+                    jerry_size_t string_end = jerry_string_to_utf8_char_buffer (item_val, m_pData, str_size);
                     assert (string_end == str_size);
                     m_pData[string_end] = 0;
                 }
@@ -38,14 +38,14 @@ PacketType VMPacket::fromJerryError(jerry_value_t error_value) {
     jerry_release_value (backtrace_val);
 
     jerry_value_t err_str_val = jerry_value_to_string (error_value);
-    jerry_size_t err_str_size = jerry_get_string_size (err_str_val);
+    jerry_size_t err_str_size = jerry_get_utf8_string_size (err_str_val);
 
     if (err_str_size >= m_capacity) {
         const char msg[] = "[Error message too long]";
         err_str_size = sizeof (msg) / sizeof (char) - 1;
         memcpy (m_pData, msg, err_str_size + 1);
     } else {
-        jerry_size_t string_end = jerry_string_to_char_buffer (err_str_val, m_pData, err_str_size);
+        jerry_size_t string_end = jerry_string_to_utf8_char_buffer (err_str_val, m_pData, err_str_size);
         assert (string_end == err_str_size);
         m_pData[string_end] = 0;
         jerry_release_value (err_str_val);
