@@ -5,58 +5,59 @@
 namespace bridge {
 
 PacketType VMPacket::fromJerryError(jerry_value_t error_value) {
-    jerry_value_t stack_str = jerry_create_string ((const jerry_char_t *) "stack");
-    jerry_value_t backtrace_val = jerry_get_property (error_value, stack_str);
-    jerry_release_value (stack_str);
+    jerry_value_t stack_str = jerry_create_string((const jerry_char_t*) "stack");
+    jerry_value_t backtrace_val = jerry_get_property(error_value, stack_str);
+    jerry_release_value(stack_str);
 
-    if (!jerry_value_is_error (backtrace_val) && jerry_value_is_array (backtrace_val)) {
-        uint32_t length = jerry_get_array_length (backtrace_val);
+    if (!jerry_value_is_error(backtrace_val) && jerry_value_is_array(backtrace_val)) {
+        uint32_t length = jerry_get_array_length(backtrace_val);
 
         /* This length should be enough. */
-        if (length > 32) {
+        if(length > 32) {
             length = 32;
         }
 
         for (uint32_t i = 0; i < length; i++) {
-            jerry_value_t item_val = jerry_get_property_by_index (backtrace_val, i);
+            jerry_value_t item_val = jerry_get_property_by_index(backtrace_val, i);
 
-            if (!jerry_value_is_error (item_val) && jerry_value_is_string (item_val)) {
-                jerry_size_t str_size = jerry_get_utf8_string_size (item_val);
+            if (!jerry_value_is_error(item_val) && jerry_value_is_string(item_val)) {
+                jerry_size_t str_size = jerry_get_utf8_string_size(item_val);
 
-                if (str_size >= m_capacity) {
+                if(str_size >= (m_capacity - 1)) {
                     std::cout << "Backtrace string too long]\n" << std::endl;
                 } else {
-                    jerry_size_t string_end = jerry_string_to_utf8_char_buffer (item_val, m_pData, str_size);
-                    assert (string_end == str_size);
+                    jerry_size_t string_end = jerry_string_to_utf8_char_buffer(item_val, m_pData, str_size);
+                    assert(string_end == str_size);
                     m_pData[string_end] = 0;
                 }
             }
 
-            jerry_release_value (item_val);
+            jerry_release_value(item_val);
         }
     }
-    jerry_release_value (backtrace_val);
+    jerry_release_value(backtrace_val);
 
-    jerry_value_t err_str_val = jerry_value_to_string (error_value);
-    jerry_size_t err_str_size = jerry_get_utf8_string_size (err_str_val);
+    jerry_value_t err_str_val = jerry_value_to_string(error_value);
+    jerry_size_t err_str_size = jerry_get_utf8_string_size(err_str_val);
 
-    if (err_str_size >= m_capacity) {
+    if (err_str_size >= (m_capacity - 1)) {
         const char msg[] = "[Error message too long]";
-        err_str_size = sizeof (msg) / sizeof (char) - 1;
-        memcpy (m_pData, msg, err_str_size + 1);
+        m_length = sprintf((char*)m_pData, "%s", msg);
     } else {
-        jerry_size_t string_end = jerry_string_to_utf8_char_buffer (err_str_val, m_pData, err_str_size);
-        assert (string_end == err_str_size);
+        jerry_size_t string_end = jerry_string_to_utf8_char_buffer(err_str_val, m_pData, err_str_size);
+        assert(string_end == err_str_size);
+        m_length = err_str_size;
         m_pData[string_end] = 0;
-        jerry_release_value (err_str_val);
+        jerry_release_value(err_str_val);
     }
     return VMError;
 }
+
 PacketType VMPacket::fromJerryString(jerry_value_t value) {
     jerry_size_t req_sz;
 
     req_sz = jerry_get_utf8_string_size(value);
-    if (req_sz > m_capacity) {
+    if (req_sz >= (m_capacity - 1)) {
         //ToDo
         std::cout << "To handle this error" << std::endl;
         return PacketFailToParse;
@@ -85,7 +86,7 @@ PacketType VMPacket::from(jerry_value_t value) {
         m_type = fromJerryString(value);
     } else if (jerry_value_is_arraybuffer(value)) {
         req_sz = jerry_get_arraybuffer_byte_length(value);
-        if (req_sz > m_capacity) {
+        if (req_sz >= (m_capacity - 1)) {
             //toDo
             std::cout << "To handle this error" << std::endl;
             goto out;
@@ -129,7 +130,7 @@ PacketType VMPacket::from(v8::Local<v8::Value> value) {
         v8::Local<v8::String> string = value->ToString();
         if (!string.IsEmpty()) {
             size_t len = 3 * string->Length() + 1;
-            if (len > m_capacity) {
+            if (len >= (m_capacity - 1)) {
                 //ToDo
                 std::cout << "to handle this error" << std::endl;
                 goto out;
@@ -143,7 +144,7 @@ PacketType VMPacket::from(v8::Local<v8::Value> value) {
         auto view = v8::Local<v8::ArrayBufferView>::Cast(value);
         auto ab = view->Buffer();
         auto contents = ab->GetContents();
-        if (view->ByteLength() > m_capacity) {
+        if (view->ByteLength() >= (m_capacity - 1)) {
             //ToDo
             std::cout << "to handle this error" << std::endl;
             goto out;
