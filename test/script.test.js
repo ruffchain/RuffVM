@@ -34,14 +34,17 @@ describe('ruff vm basic', function() {
     assert(res2 === '{"ret":"HELLO"}')
   })
 
-  it('should exit run infinite loop when set cpu limit', async () => {
-    const res = await createScript()
-      .setUserCode('while(1){};')
-      .setOption({ cpuCount: 200, memSizeKB: 256 })
-      .runAsync()
-    assert(res === '{"error": "Abort script"}')
+  it('should exit run infinite loop when set cpu limit', (done) => {
+    createScript()
+        .setUserCode('while(1){};')
+        .setOption({ cpuCount: 200, memSizeKB: 256 })
+        .runAsync()
+        .then()
+        .catch((err) => {
+            assert.equal(err, 'Error: {"error": "Abort script"}', 'expected error in VM')
+            done()
+        })
   })
-
   it('should get value in script from context', async () => {
     var code = 'var ruff = {value: "hello"};'
     const res = await createScript(code)

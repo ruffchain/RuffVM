@@ -83,6 +83,7 @@ namespace bridge {
             }
         }
     private:
+        PacketType fromJerryError(jerry_value_t error_value);
         PacketType fromJerryString(jerry_value_t value);
 
         uint8_t* m_pData;

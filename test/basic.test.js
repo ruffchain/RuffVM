@@ -36,7 +36,7 @@ describe('ruff vm basic', function() {
 
     it('should exit run infinite loop when set cpu limit', (done) => {
         vm.run('while(1){};', null, null, { cpuCount: 200, memSizeKB: 256}, (err, ret) => {
-            done(assert(ret == '{"error": "Abort script"}'));
+            done(assert.equal(ret, 'Error: {"error": "Abort script"}', 'expected error in VM'));
         });
     });
 

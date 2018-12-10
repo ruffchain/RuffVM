@@ -1,7 +1,57 @@
+#include <assert.h>
 #include <iostream>
 #include "bridge.h"
 
 namespace bridge {
+
+PacketType VMPacket::fromJerryError(jerry_value_t error_value) {
+    jerry_value_t stack_str = jerry_create_string ((const jerry_char_t *) "stack");
+    jerry_value_t backtrace_val = jerry_get_property (error_value, stack_str);
+    jerry_release_value (stack_str);
+
+    if (!jerry_value_is_error (backtrace_val) && jerry_value_is_array (backtrace_val)) {
+        uint32_t length = jerry_get_array_length (backtrace_val);
+
+        /* This length should be enough. */
+        if (length > 32) {
+            length = 32;
+        }
+
+        for (uint32_t i = 0; i < length; i++) {
+            jerry_value_t item_val = jerry_get_property_by_index (backtrace_val, i);
+
+            if (!jerry_value_is_error (item_val) && jerry_value_is_string (item_val)) {
+                jerry_size_t str_size = jerry_get_string_size (item_val);
+
+                if (str_size >= m_capacity) {
+                    std::cout << "Backtrace string too long]\n" << std::endl;
+                } else {
+                    jerry_size_t string_end = jerry_string_to_char_buffer (item_val, m_pData, str_size);
+                    assert (string_end == str_size);
+                    m_pData[string_end] = 0;
+                }
+            }
+
+            jerry_release_value (item_val);
+        }
+    }
+    jerry_release_value (backtrace_val);
+
+    jerry_value_t err_str_val = jerry_value_to_string (error_value);
+    jerry_size_t err_str_size = jerry_get_string_size (err_str_val);
+
+    if (err_str_size >= m_capacity) {
+        const char msg[] = "[Error message too long]";
+        err_str_size = sizeof (msg) / sizeof (char) - 1;
+        memcpy (m_pData, msg, err_str_size + 1);
+    } else {
+        jerry_size_t string_end = jerry_string_to_char_buffer (err_str_val, m_pData, err_str_size);
+        assert (string_end == err_str_size);
+        m_pData[string_end] = 0;
+        jerry_release_value (err_str_val);
+    }
+    return VMError;
+}
 PacketType VMPacket::fromJerryString(jerry_value_t value) {
     jerry_size_t req_sz;
 
@@ -53,9 +103,8 @@ PacketType VMPacket::from(jerry_value_t value) {
         jerry_release_value(stringified);
     } else if (jerry_value_is_error(value)) {
         stringified = jerry_get_value_from_error(value, false);
-        m_type = fromJerryString(stringified);
+        m_type = fromJerryError(stringified);
         jerry_release_value(stringified);
-        return PacketFailToParse;
     } else if (jerry_value_is_undefined(value)) {
         m_type = VMUndefined;
     } else {
@@ -146,6 +195,8 @@ v8::Local<v8::Value> VMPacket::toV8Value(v8::Isolate *isolate) const {
         ret = Nan::New(m_variantValue.number);
     } else if (m_type == bridge::VMBool) {
         ret = Nan::New(m_variantValue.isTrue);
+    } else if (m_type == VMError) {
+        ret = Nan::Error((const char*)m_pData);
     } else {
         ret = Nan::Undefined();
     }

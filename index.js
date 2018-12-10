@@ -44,7 +44,7 @@ class Script {
     return new Promise((resolve, reject) => {
       vm.run(_userCode, _script, _sandbox, _option, (err, res) => {
         setImmediate(() => {
-          err ? reject(err) : resolve(res)
+          err ? reject(res) : resolve(res)
           isVmBusy = false
         })
       })
