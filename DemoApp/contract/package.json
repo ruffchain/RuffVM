@@ -1,0 +1,25 @@
+{
+  "name": "contract",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bignumber.js": "^8.0.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "7",
+    "babel-preset-env": "^1.7.0",
+    "mocha": "^5.2.0",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2"
+  },
+  "scripts": {
+    "start": "npm run build && npm run test",
+    "build": "webpack --config .webpack.config.js",
+    "test": "mocha test/*test.js --reporter spec --colors"
+  }
+}
