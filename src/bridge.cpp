@@ -183,17 +183,17 @@ jerry_value_t VMPacket::toJerryValue() const {
 v8::Local<v8::Value> VMPacket::toV8Value(v8::Isolate *isolate) const {
     v8::Local<v8::Value> ret;
 
-    if (m_type == bridge::VMArrayBuffer) {
+    if (m_type == VMArrayBuffer) {
         v8::Local<v8::ArrayBuffer> ab = v8::ArrayBuffer::New(isolate, m_length);
         memcpy(ab->GetContents().Data(), m_pData, m_length);
         return ab;
     }
 
-    if (m_type == bridge::VMString) {
+    if (m_type == VMString) {
         ret = Nan::New((const char*)m_pData, m_length).ToLocalChecked();
-    } else if (m_type == bridge::VMNumber) {
+    } else if (m_type == VMNumber) {
         ret = Nan::New(m_variantValue.number);
-    } else if (m_type == bridge::VMBool) {
+    } else if (m_type == VMBool) {
         ret = Nan::New(m_variantValue.isTrue);
     } else if (m_type == VMError) {
         ret = Nan::Error((const char*)m_pData);
