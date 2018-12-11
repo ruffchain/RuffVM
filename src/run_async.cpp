@@ -240,7 +240,7 @@ void onWorkDone(uv_work_t* req, int status)
     Isolate *isolate = Isolate::GetCurrent();
 
     Nan::HandleScope scope;
-    Handle<Value> argv[0];
+    Handle<Value> argv[2];
     if (work->pReturnValue->type() == bridge::VMError) {
         argv[0] = work->pReturnValue->toV8Value(isolate);
         argv[1] = Nan::Null();
