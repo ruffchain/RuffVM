@@ -1,5 +1,6 @@
-RuffVM
-==========
+[![Build Status](https://travis-ci.com/ruffchain/RuffVM.svg?branch=master)](https://travis-ci.com/ruffchain/RuffVM)
+
+# RuffVM
 
 RuffVM is a light-weight VM environment designed for DApps(Decentralized applications). It provides secure, isolated execution environment as well as resource control (e.g Memory and CPU) for Dapps. It lowers the barrier of Blockchain application development by significant amount via JavaScript based abstraction (But not limited to JS).
 
