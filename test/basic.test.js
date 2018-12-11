@@ -16,18 +16,18 @@ describe('ruff vm basic', function() {
   describe('run', function() {
     it('should run simple script with empty context', (done) => {
         vm.run('({ret: "HI"})', null, null, null, (err, ret) => {
-            assert(err === false);
+            assert(err === null);
             done(assert(ret === '{"ret":"HI"}'));
         });
     });
 
     it('should twice run simple script with empty context', (done) => {
         vm.run('({ret: "HI"})', null, null, null, (err, ret) => {
-            assert(err === false);
+            assert(err === null);
             assert(ret === '{"ret":"HI"}');
             setImmediate(() => {
                 vm.run('({ret: "HELLO"})', null, null, null, (err, ret) => {
-                    assert(err === false);
+                    assert(err === null);
                     done(assert(ret === '{"ret":"HELLO"}'));
                 });
             });
@@ -36,7 +36,7 @@ describe('ruff vm basic', function() {
 
     it('should exit run infinite loop when set cpu limit', (done) => {
         vm.run('while(1){};', null, null, { cpuCount: 200, memSizeKB: 256}, (err, ret) => {
-            done(assert.equal(ret, 'Error: {"error": "Abort script"}', 'expected error in VM'));
+            done(assert.equal(err, 'Error: {"error": "Abort script"}', 'expected error in VM'));
         });
     });
 
@@ -235,7 +235,7 @@ describe('ruff vm basic', function() {
         const contextU8Buf = new Uint8Array(contextAB, 0, contextAB.byteLength);
         vm.run('helloFun("ruffVM")', contextU8Buf, apiObject,  {cpuCount:1, memSizeKB:200}, (err, ret) => {
             assert(isTriggered);
-            done(assert(err === false && ret === true));
+            done(assert(err === null && ret === true));
         });
     });
 
@@ -267,7 +267,7 @@ describe('ruff vm basic', function() {
           const contextU8Buf = new Uint8Array(contextAB, 0, contextAB.byteLength);
           vm.run('helloFun("ruffVM")', contextU8Buf, apiObject,  {cpuCount:1, memSizeKB:200}, (err, ret) => {
               assert(isTriggered);
-              done(assert(err === false && ret === true));
+              done(assert(err === null && ret === true));
           });
       });
 
