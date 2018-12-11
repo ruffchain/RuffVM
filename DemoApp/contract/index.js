@@ -1,13 +1,11 @@
 const BigNumber = require('bignumber.js');
+const assert = require('assert');
 
 function doTransfer(from, amount) {
     const accountA = '12nD5LgUnLZDbyncFnoFB43YxhSFsERcgQ';
     const accountB = '1LuwjNj8wkqo237N7Gh8nZSSvUa6TZ5ds4';
 
-    if (this.getReceiver() !== '1EYLLvMtXGeiBJ7AZ6KJRP2BdAQ2Bof79') {
-        return false;
-    }
-
+    assert.equal(this.getReceiver(), '1EYLLvMtXGeiBJ7AZ6KJRP2BdAQ2Bof79', 'invalid _receiver');
     var amountValue = new BigNumber(amount);
     let toAValue = amountValue.div(2).toString();
     let toBValue = amountValue.div(2).toString();
