@@ -66,7 +66,7 @@
                 "OS=='linux'", {
                     "cflags_cc": [
                         "-O2",
-                        "-std=c++14",
+                        "-std=c++1y",
                         "-pedantic",
                         "-Wall",
                         "-fstrict-aliasing",
