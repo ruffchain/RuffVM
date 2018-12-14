@@ -172,6 +172,14 @@ void cleanupUvAsync(uv_handle_s* handle) {
 }
 
 void resolveFunction(const FunctionCallbackInfo<v8::Value>& info) {
+    // bool isError = false;
+    if (info.Length() == 0) {
+        return;
+    }
+
+    // if (info.Length() == 2 && info[1]->IsBoolean()) {
+    //     isError = Nan::To<bool>(info[1]).FromJust();
+    // }
     auto pVmAddOn = reinterpret_cast<ruffvm::VMAddOn*>(info.Data().As<External>()->Value());
     auto pVMPacket = std::make_unique<bridge::VMPacket>();
     pVMPacket->from(info[0]);
