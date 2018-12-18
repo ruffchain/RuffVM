@@ -30,7 +30,7 @@ RuffVM leverage jerryscript(a lightweight JavaScript engine) as javascript runti
 Refer some idea from [duktape.node](https://github.com/ndob/duktape-node).
 
 ## Building manually and running tests
-> Currently enabled build on Macos only
+> Currently enabled build on Macos & Linux with C++1y support
 
 build
 ```
