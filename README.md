@@ -196,7 +196,6 @@ ruffvm-node support set limit on CPU and Memory comparing to duktape.node
 
 * ~~Enable build on Linux~~
 * ~~Add chain style API~~
-* Enable build on Windows
 * Add SharedArrayBuffer support (ES2017)
 * Evaluate `XS` JavaScript Engine
 
