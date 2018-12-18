@@ -9,13 +9,13 @@ RuffVM's build-in,plug-in mechanism allows developers to customize DApp runtime 
 ## RoadMap
 ### Present
 * 0.1 Implementation on Node.js
+* 0.2 Build-in modules
 
 ### In progress
-* Build-in modules
+* Verification and optimization on ruffchain blockchain
 * Standerlize modules build-in, plug-in mechanism
 
 ### Future release
-* Verification and optimization on ruffchain blockchain
 * Split out ruffvm-core into separate repo
 * Port to EOS
 * Port to Ethereum
