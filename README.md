@@ -194,10 +194,10 @@ ruffvm-node support set limit on CPU and Memory comparing to duktape.node
 
 ## To do list
 
-* ~~Enable build on Linux~~
-* ~~Add chain style API~~
-* Add SharedArrayBuffer support (ES2017)
-* Evaluate `XS` JavaScript Engine
+* [x] Enable build on Linux
+* [x] Add chain style API
+* [ ] Add SharedArrayBuffer support (ES2017)
+* [ ] Evaluate `XS` JavaScript Engine
 
 ## Known improvements
 Does not support multiple instance of vm run simultaneously. Communication between VM and Host is not optimized for heavily usage scenario.
