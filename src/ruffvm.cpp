@@ -214,7 +214,7 @@ RuffVM::RuffVM(uint32_t cpuCount, uint32_t memSizeKB)
     m_cpuCount = cpuCount;
     m_ctx = jerry_create_context(memSizeKB * 1024, context_alloc, &m_memInfo);
     cbCache.registerContext(m_ctx);
-    jerry_port_default_set_context(m_ctx);
+    jerry_port_default_set_current_context(m_ctx);
     jerry_init(JERRY_INIT_EMPTY);
     jerryx_handler_register_global ((const jerry_char_t *) "print",
                                   jerryx_handler_print);

@@ -95,7 +95,7 @@ PacketType VMPacket::from(jerry_value_t value) {
         m_length = req_sz;
         m_type = VMArrayBuffer;
     } else if (jerry_value_is_object(value)) {
-        stringified = jerry_json_stringfy (value);
+        stringified = jerry_json_stringify(value);
         if (jerry_value_is_error(stringified)) {
             std::cout << "error when serializeData" << std::endl;
             goto out;
