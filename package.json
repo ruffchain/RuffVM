@@ -1,25 +1,37 @@
 {
   "name": "ruff-vm",
-  "author": "ruff",
   "description": "Ruff VM",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "main": "./index.js",
   "license": "MIT",
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/ruffchain/RuffVM"
   },
   "dependencies": {
     "bindings": "1.1.1",
-    "node-gyp": "^3.0.2"
+    "node-gyp": "^3.0.2",
+    "nan": "^2.11.0"
   },
   "devDependencies": {
-    "mocha": "^5.2.0",
-    "nan": "^2.11.0"
+    "mocha": "^5.2.0"
   },
   "engines": {
     "node": ">=8.10.0"
   },
+  "types": "index.d.ts",
   "scripts": {
-    "test": "mocha  test/*.test.js --reporter spec --colors"
-  }
+    "test": "mocha  test/*.test.js --reporter spec --colors",
+    "install": "node-gyp rebuild"
+  },
+  "author": "topelinux <topelinux@gmail.com>",
+  "homepage": "https://github.com/ruffchain/RuffVM/blob/master/README.md",
+  "bugs": {
+    "url": "https://github.com/ruffchain/RuffVM/issues"
+  },
+  "keywords": [
+    "ruffvm",
+    "ruffchain"
+  ],
+  "gypfile": true
 }
