@@ -1,7 +1,7 @@
 {
   "name": "ruff-vm",
   "description": "Ruff VM",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "main": "./index.js",
   "license": "MIT",
   "repository": {
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "bindings": "1.1.1",
-    "node-gyp": "^3.0.2",
+    "node-gyp": "^4.0.0",
     "nan": "^2.11.0"
   },
   "devDependencies": {
