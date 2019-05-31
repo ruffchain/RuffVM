@@ -38,7 +38,11 @@ describe('ruff vm basic', function() {
     it('should not crash when do JSON', (done) => {
         let jsonCode = fs.readFileSync('test/jsonTest.txt').toString();
         code = jsonCode;
-        vm.run(code, null, null, null, (err, ret) => {
+        const contextAB = bufferToArrayBuffer(Buffer.from(jsonCode));
+        const contextU8Buf = new Uint8Array(contextAB, 0, contextAB.byteLength);
+
+        vm.run(null, contextU8Buf, null, null, (err, ret) => {
+            console.log(err);
             if (err) {
                 done();
             }
