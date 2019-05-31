@@ -1,5 +1,6 @@
 const assert = require('assert');
 const vm = require('../index.js');
+const fs = require('fs');
 
 function bufferToArrayBuffer(b ){
     return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
@@ -32,6 +33,34 @@ describe('ruff vm basic', function() {
                 });
             });
         });
+    });
+
+    it('should not crash when do JSON', (done) => {
+        let jsonCode = fs.readFileSync('test/jsonTest.txt').toString();
+        code = jsonCode;
+        vm.run(code, null, null, null, (err, ret) => {
+            if (err) {
+                done();
+            }
+        });
+    });
+
+    it('should not crash when do Array', (done) => {
+
+        let code = `
+            function a (n) {
+              var array = new Int32Array(n)
+              var array2 = new Int32Array(array)
+              array2.set(new Uint8Array(array.buffer, 34))
+              print(array2);
+            }
+            print("before a");
+            a(10)
+        `;
+        vm.run(code, null, null, null, (err, ret) => {
+            done(assert(err===null));
+        });
+
     });
 
     it('should exit run infinite loop when set cpu limit', (done) => {
