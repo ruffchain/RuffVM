@@ -228,8 +228,8 @@ NAN_ADDON_UV_ASYNC_CB(callV8FunctionOnMainThread) {
     }
 
     signalData->done = true;
-    uv_mutex_unlock(&signalData->mutex);
     uv_cond_signal(&signalData->cv);
+    uv_mutex_unlock(&signalData->mutex);
 }
 
 void onWork(uv_work_t* req)
@@ -237,7 +237,10 @@ void onWork(uv_work_t* req)
     // Do not use scoped-wrapper as req is still needed in onWorkDone.
     WorkRequest* work = static_cast<WorkRequest*> (req->data);
 
+
+    PLOG(plog::info) << "Before rm run";
     work->pReturnValue = work->vm.run(work->script, work->context.c_str(), work->context.length());
+    PLOG(plog::info) << "after rm run";
     work->hasError = work->pReturnValue->type() == bridge::VMError;
 }
 
@@ -265,6 +268,7 @@ void onWorkDone(uv_work_t* req, int status)
     {
         Nan::FatalException(try_catch);
     }
+    PLOG(plog::info) << "Exit";
 }
 
 } // unnamed namespace
@@ -276,6 +280,8 @@ NAN_METHOD(run) {
     std::string context;
     uint32_t cpuTime = 0xFFFFFFFF;
     uint32_t memSizeKB = 128;
+
+    PLOG(plog::info) << "module run Enter";
 
     if (info[1]->IsArrayBufferView()) {
         Nan::TypedArrayContents<uint8_t> data(info[1]);
@@ -331,6 +337,7 @@ NAN_METHOD(run) {
     uv_work_t* req = new uv_work_t();
     req->data = workReq;
 
+    PLOG(plog::info) << "request work";
     uv_queue_work(uv_default_loop(), req, onWork, onWorkDone);
 
     return;

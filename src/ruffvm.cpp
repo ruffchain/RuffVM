@@ -34,36 +34,6 @@ Result ruffvm_jerry_string_value_to_string(jerry_value_t value, const char* buff
     return ret;
 }
 
-//Result serializeData(const jerry_value_t value)
-//{
-//    Result res;
-//    jerry_char_t str_buf_p[1024] = { 0 };
-//    jerry_value_t stringified;
-//
-//    if (jerry_value_is_error(value)) {
-//        stringified = jerry_get_value_from_error(value, false);
-//        if (!jerry_value_is_string(stringified)) {
-//            res.errorCode = 1;
-//            goto failed;
-//        }
-//    } else if (jerry_value_is_string(value)) {
-//        stringified = jerry_acquire_value(value);
-//    } else {
-//        stringified = jerry_json_stringfy(value);
-//        if (jerry_value_is_error(stringified)) {
-//            printf("error when serializeData");
-//            res.errorCode = 1;
-//            goto failed;
-//        }
-//    }
-//    res = ruffvm_jerry_string_value_to_string(stringified, (const char*)str_buf_p, sizeof(str_buf_p));
-//failed:
-//    jerry_release_value(stringified);
-//
-//    return res;
-//}
-//
-
 #define RUFFVM_MAX_FUNC_NAME_SIZE   128
 static jerry_value_t
 callbackHandler(const jerry_value_t function_obj,
@@ -165,22 +135,15 @@ ruffvm_register_js_function(const jerry_char_t* name_p, /**< name of the functio
 }
 
 
-//Result getError(jerry_context_t* ctx, int errorCode)
-//{
-//    Result res;
-//    // Get error string.
-//    res.value = "Error to implemtn";
-//    res.errorCode = errorCode;
-//    return res;
-//}
-
 static void *
 context_alloc (size_t size,
                void *cb_data_p)
 {
     struct ruffvm::MemInfo* pMemInfo = (struct ruffvm::MemInfo*)cb_data_p;
-    pMemInfo->memSizeUsed += (uint32_t)size;
-//    printf("max is %d used is %d\n", pMemInfo->memSizeMax, pMemInfo->memSizeUsed);
+    if (size > pMemInfo->memSizeMax) {
+        PLOG(plog::warning) << "Exceed max memory size" << size << "MAX size" << pMemInfo->memSizeMax;
+        //return nullptr;
+    }
     return malloc (size);
 } /* context_alloc */
 
@@ -191,20 +154,22 @@ vm_exec_stop_callback (void *user_p)
 {
     uint32_t* pCpuCount = (uint32_t*)user_p;
 
+    PLOG(plog::debug) << "Enter" << *pCpuCount;
     while (*pCpuCount != 0) {
         (*pCpuCount)--;
         return jerry_create_undefined ();
     }
 
+    PLOG(plog::info) << "Exit";
     // The error flag is added automatically.
     return jerry_create_string ((const jerry_char_t *) "{\"error\": \"Abort script\"}");
 }
 
 
 namespace ruffvm {
-
 RuffVM::RuffVM(uint32_t cpuCount, uint32_t memSizeKB)
 {
+    PLOG(plog::info) << "Enter";
     if (memSizeKB > 512) {
         memSizeKB = 512;
     }
@@ -226,6 +191,7 @@ RuffVM::RuffVM(uint32_t cpuCount, uint32_t memSizeKB)
 
 RuffVM::~RuffVM()
 {
+    PLOG(plog::info) << "Exit";
     cbCache.unregisterContext(m_ctx);
     jerry_cleanup();
     free(m_ctx);
@@ -237,6 +203,7 @@ std::unique_ptr<bridge::VMPacket> RuffVM::run(const std::string& script, const c
     jerry_value_t contextRet;
     auto pVMPacket = std::make_unique<bridge::VMPacket>();
 
+    PLOG(plog::info) << "Enter";
     if (context_size != 0) {
         contextRet = jerry_eval((const jerry_char_t*)context, context_size, JERRY_PARSE_STRICT_MODE);
     }
@@ -254,6 +221,7 @@ std::unique_ptr<bridge::VMPacket> RuffVM::run(const std::string& script, const c
     if (context_size) {
         jerry_release_value(contextRet);
     }
+    PLOG(plog::info) << "Exit";
     return pVMPacket;
 }
 

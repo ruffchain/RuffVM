@@ -28,6 +28,7 @@
                 "lib/jerryscript/jerry-ext/include/",
                 "lib/PolyM",
                 "lib/incbin",
+                "lib/plog/include",
                 "src",
                 "<!(node -e \"require('nan')\")"
             ],

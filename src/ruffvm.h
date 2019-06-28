@@ -2,6 +2,7 @@
 
 #include "callback.h"
 #include "bridge.h"
+#include "plog/Log.h"
 
 #include "jerryscript.h"
 #include <string>
