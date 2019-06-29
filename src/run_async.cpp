@@ -124,10 +124,11 @@ struct CallbackHelper
     CallbackHelper(Local<Function> apiCallbackFunc, ruffvm::VMAddOn* pVmAddOn):
     m_persistentApiCallbackFunc(apiCallbackFunc), pVmAddOn(pVmAddOn)
     {
+        PLOG(plog::info) << "CallbackHelper Enter: " << this;
     }
-
     ~CallbackHelper()
     {
+        PLOG(plog::info) << "CallbackHelper Exit: " << this;
         m_persistentApiCallbackFunc.Reset();
     }
 
@@ -329,6 +330,7 @@ NAN_METHOD(run) {
 
             Nan::Utf8String  keyStr(key);
             CallbackHelper vmToNodeBridge(Local<Function>::Cast(value), &(workReq->vmAddon));
+            PLOG(plog::debug) << "vmToNodeBridge is" << &vmToNodeBridge;
             workReq->vm.registerCallback(std::string(*keyStr), vmToNodeBridge);
         }
     }

@@ -16,9 +16,11 @@ struct Result
     std::string value;
 };
 
-struct MemInfo {
+struct VmInfo {
     uint32_t memSizeMax;
     uint32_t memSizeUsed;
+    uint32_t cpuCount;
+    u_int32_t defInnerCpuCycle;
 };
 
 class RuffVM
@@ -32,8 +34,7 @@ public:
 
 private:
     jerry_context_t* m_ctx;
-    uint32_t m_cpuCount;
-    struct MemInfo m_memInfo;
+    struct VmInfo m_vmInfo;
 };
 
 }  // namespace ruffvm

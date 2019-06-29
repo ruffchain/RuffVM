@@ -56,9 +56,7 @@ describe('ruff vm basic', function() {
               var array = new Int32Array(n)
               var array2 = new Int32Array(array)
               array2.set(new Uint8Array(array.buffer, 34))
-              print(array2);
             }
-            print("before a");
             a(10)
         `;
         vm.run(code, null, null, null, (err, ret) => {
@@ -68,7 +66,23 @@ describe('ruff vm basic', function() {
     });
 
     it('should exit run infinite loop when set cpu limit', (done) => {
-        vm.run('while(1){};', null, null, { cpuCount: 200, memSizeKB: 256}, (err, ret) => {
+
+        function hostTest() {
+            console.log('in hosttest');
+            return 1;
+        }
+        let apiTable = {
+            apiTest: hostTest
+        };
+        vm.run(`var num =0;
+                while(1) {
+                    var buf = new Uint8Array(1024);
+                    buf[num] = new  Uint8Array(1024);
+                    num += 1;
+                    apiTest();
+                    //print(buf);
+                }`,
+            null, apiTable, { cpuCount: 1000, memSizeKB: 256}, (err, ret) => {
             done(assert.equal(err, 'Error: {"error": "Abort script"}', 'expected error in VM'));
         });
     });

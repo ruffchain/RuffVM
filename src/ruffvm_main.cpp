@@ -17,7 +17,6 @@ NAN_MODULE_INIT(init)
     const char* fileName = std::getenv("RUFFVM_LOG_FILE");
 
     if (level) {
-        plog::Severity severity;
         if (!fileName) {
             fileName = "ruffvm_log.txt";
         }

@@ -87,7 +87,7 @@ callbackHandler(const jerry_value_t function_obj,
             }
         } else {
             //Todo: return error object to Jerry
-            printf("exceed max name size %d\n", RUFFVM_MAX_FUNC_NAME_SIZE);
+            PLOG(plog::error) << "exceed max name size" << RUFFVM_MAX_FUNC_NAME_SIZE;
             ret_val = jerry_create_undefined();
         }
     } else {
@@ -115,7 +115,7 @@ ruffvm_register_js_function(const jerry_char_t* name_p, /**< name of the functio
 
     // ToDo: finish sanity check here
     if (jerry_value_is_error(result_val)) {
-        printf("Error!!! failed to set prop_name");
+        PLOG(plog::error) << "Error!!! failed to set prop_name";
     }
     jerry_release_value(prop_name);
     jerry_release_value(prop_value);
@@ -124,7 +124,7 @@ ruffvm_register_js_function(const jerry_char_t* name_p, /**< name of the functio
     result_val = jerry_set_property(global_obj_val, function_name_val, function_val);
 
     if (jerry_value_is_error(result_val)) {
-        printf("Error!!! failed to set prop_name");
+        PLOG(plog::error) << "Error!!! failed to set prop_name";
     }
 
     jerry_release_value(function_val);
@@ -139,11 +139,7 @@ static void *
 context_alloc (size_t size,
                void *cb_data_p)
 {
-    struct ruffvm::MemInfo* pMemInfo = (struct ruffvm::MemInfo*)cb_data_p;
-    if (size > pMemInfo->memSizeMax) {
-        PLOG(plog::warning) << "Exceed max memory size" << size << "MAX size" << pMemInfo->memSizeMax;
-        //return nullptr;
-    }
+    //struct ruffvm::VmInfo* pVmInfo = (struct ruffvm::VmInfo*)cb_data_p;
     return malloc (size);
 } /* context_alloc */
 
@@ -152,11 +148,11 @@ context_alloc (size_t size,
 static jerry_value_t
 vm_exec_stop_callback (void *user_p)
 {
-    uint32_t* pCpuCount = (uint32_t*)user_p;
+    ruffvm::VmInfo* pInfo = (ruffvm::VmInfo*)user_p;
 
-    PLOG(plog::debug) << "Enter" << *pCpuCount;
-    while (*pCpuCount != 0) {
-        (*pCpuCount)--;
+    PLOG(plog::debug) << "Enter" << pInfo->cpuCount;
+    while (pInfo->cpuCount != 0) {
+        pInfo->cpuCount--;
         return jerry_create_undefined ();
     }
 
@@ -173,18 +169,18 @@ RuffVM::RuffVM(uint32_t cpuCount, uint32_t memSizeKB)
     if (memSizeKB > 512) {
         memSizeKB = 512;
     }
-    m_memInfo.memSizeMax = memSizeKB * 1024;
-    m_memInfo.memSizeUsed = 0;
-
-    m_cpuCount = cpuCount;
-    m_ctx = jerry_create_context(memSizeKB * 1024, context_alloc, &m_memInfo);
-    cbCache.registerContext(m_ctx);
+    m_vmInfo.memSizeMax = memSizeKB * 1024;
+    m_vmInfo.memSizeUsed = 0;
+    m_vmInfo.defInnerCpuCycle = 8;
+    m_vmInfo.cpuCount = cpuCount;
+    m_ctx = jerry_create_context(memSizeKB * 1024, context_alloc, &m_vmInfo);
+    cbCache.registerContext(m_ctx, &m_vmInfo);
     jerry_port_default_set_current_context(m_ctx);
     jerry_init(JERRY_INIT_EMPTY);
-    jerryx_handler_register_global ((const jerry_char_t *) "print",
-                                  jerryx_handler_print);
-    if (m_cpuCount != 0xFFFFFFFF) {
-        jerry_set_vm_exec_stop_callback (vm_exec_stop_callback, &m_cpuCount, 64);
+    //jerryx_handler_register_global ((const jerry_char_t *) "print",
+    //                              jerryx_handler_print);
+    if (m_vmInfo.cpuCount != 0xFFFFFFFF) {
+        jerry_set_vm_exec_stop_callback (vm_exec_stop_callback, &m_vmInfo, 2);
     }
     snapshotLoad();
 }
@@ -214,7 +210,7 @@ std::unique_ptr<bridge::VMPacket> RuffVM::run(const std::string& script, const c
         pVMPacket->from(scriptRet);
         jerry_release_value(scriptRet);
     } else {
-        std::cout << "error when eval context" << std::endl;
+        PLOG(plog::error) << "error when eval context";
         pVMPacket->from(bridge::InvalidScript);
     }
 
@@ -228,7 +224,7 @@ std::unique_ptr<bridge::VMPacket> RuffVM::run(const std::string& script, const c
 void RuffVM::registerCallback(const std::string& functionName, Callback callback)
 {
     ruffvm_register_js_function((const jerry_char_t*)functionName.c_str(), callbackHandler);
-    cbCache.addCallback(m_ctx, functionName, callback);
+    cbCache.addCallback(m_ctx, functionName, std::forward<Callback>(callback));
 }
 
 } // namespace ruffvm
