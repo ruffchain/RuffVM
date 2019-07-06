@@ -56,8 +56,27 @@ function createScript(code) {
   return new Script(code)
 }
 
+function resolveHelper(resolve, timeoutMS) {
+    if (timeoutMS == undefined) {
+        timeoutMS = 100;
+    }
+    let _resolved = false;
+    let _timer = setTimeout(() => {
+        _resolved = true;
+        resolve(new Error());
+    }, timeoutMS);
+    return (value) => {
+        if (!_resolved) {
+            clearTimeout(_timer);
+            resolve(value);
+            _resolved = true;
+        }
+    };
+}
+
 module.exports = {
   run: vm.run,
   Script,
-  createScript
+  createScript,
+  resolveHelper
 }

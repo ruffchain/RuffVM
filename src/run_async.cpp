@@ -216,7 +216,7 @@ NAN_ADDON_UV_ASYNC_CB(callV8FunctionOnMainThread) {
     if (try_catch.HasCaught()) {
         String::Utf8Value stack_trace(try_catch.StackTrace().ToLocalChecked());
         if (stack_trace.length() > 0) {
-            std::cout << *stack_trace << std::endl;
+            PLOG(plog::error) << *stack_trace;
         }
         signalData->pRetVal->from(bridge::HostException);
     } else {
@@ -237,7 +237,6 @@ void onWork(uv_work_t* req)
 {
     // Do not use scoped-wrapper as req is still needed in onWorkDone.
     WorkRequest* work = static_cast<WorkRequest*> (req->data);
-
 
     PLOG(plog::info) << "Before rm run";
     work->pReturnValue = work->vm.run(work->script, work->context.c_str(), work->context.length());

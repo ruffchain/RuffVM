@@ -1,5 +1,5 @@
 const assert = require('assert')
-const { Script, createScript } = require('../index.js')
+const { Script, createScript, resolveHelper } = require('../index.js')
 
 function bufferToArrayBuffer(b) {
   return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)
@@ -247,4 +247,62 @@ describe('Context', function() {
     assert(isTriggered)
     assert(res === true)
   })
+})
+
+describe('vm resolve helper', function() {
+  let apiObject = {
+    apiResolveTest: hostResolveTest,
+    apiResolveTimeoutTest: hostResolveTimeoutTest,
+    apiConsole: hostConsole,
+  };
+
+  function hostResolveTest(vmResolve) {
+    let vmResolver = resolveHelper(vmResolve, 100);
+    return new Promise(function(resolve) {
+      setTimeout(() => {
+        resolve(vmResolver('hi ruffvm'));
+      },10)
+    });
+  }
+
+  function hostResolveTimeoutTest(vmResolve) {
+    let vmResolver = resolveHelper(vmResolve, 40);
+    return new Promise(function(resolve) {
+      setTimeout(() => {
+        resolve(vmResolver('hi ruffvm'));
+      },50);
+    });
+  }
+
+  function hostConsole(resolve, info) {
+    console.log(info);
+  }
+
+  it('resolve helper should be trggered when timeout', async() => {
+    let code = `
+        ret = apiResolveTimeoutTest();
+    `;
+    try {
+      const res = await createScript()
+        .setUserCode(code)
+        .setSandbox(apiObject)
+        .setOption({ cpuCount: 256, memSizeKB: 200 })
+        .runAsync();
+    } catch (err) {
+      assert.equal(err, 'Error: {"error": "Exception"}', 'expected error in vm');
+    }
+  });
+
+  it('resolve helper should resolve expected value in Host', async() => {
+    let code = `
+        ret = apiResolveTest();
+    `;
+    const res = await createScript()
+      .setUserCode(code)
+      .setSandbox(apiObject)
+      .setOption({ cpuCount: 256, memSizeKB: 200 })
+      .runAsync();
+
+    assert.equal(res, 'hi ruffvm', 'invalid resolved value from host');
+  });
 })

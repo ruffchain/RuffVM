@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <iostream>
+#include "ruffvm.h"
 #include "bridge.h"
 
 namespace bridge {
@@ -24,7 +25,7 @@ PacketType VMPacket::fromJerryError(jerry_value_t error_value) {
                 jerry_size_t str_size = jerry_get_utf8_string_size(item_val);
 
                 if(str_size >= (m_capacity - 1)) {
-                    std::cout << "Backtrace string too long]\n" << std::endl;
+                    PLOG(plog::info) << "Backtrace string too long]\n";
                 } else {
                     jerry_size_t string_end = jerry_string_to_utf8_char_buffer(item_val, m_pData, str_size);
                     assert(string_end == str_size);
@@ -59,7 +60,7 @@ PacketType VMPacket::fromJerryString(jerry_value_t value) {
     req_sz = jerry_get_utf8_string_size(value);
     if (req_sz >= (m_capacity - 1)) {
         //ToDo
-        std::cout << "To handle this error" << std::endl;
+        PLOG(plog::info) << "To handle this error";
         return PacketFailToParse;
     } else {
         jerry_string_to_utf8_char_buffer(value, (jerry_char_t*)m_pData, req_sz);
@@ -88,7 +89,7 @@ PacketType VMPacket::from(jerry_value_t value) {
         req_sz = jerry_get_arraybuffer_byte_length(value);
         if (req_sz >= (m_capacity - 1)) {
             //toDo
-            std::cout << "To handle this error" << std::endl;
+            PLOG(plog::info) << "To handle this error";
             goto out;
         }
         jerry_arraybuffer_read(value, 0, m_pData, req_sz);
@@ -97,7 +98,7 @@ PacketType VMPacket::from(jerry_value_t value) {
     } else if (jerry_value_is_object(value)) {
         stringified = jerry_json_stringify(value);
         if (jerry_value_is_error(stringified)) {
-            std::cout << "error when serializeData" << std::endl;
+            PLOG(plog::info) << "error when serializeData";
             goto out;
         }
         m_type = fromJerryString(stringified);
@@ -109,7 +110,7 @@ PacketType VMPacket::from(jerry_value_t value) {
     } else if (jerry_value_is_undefined(value)) {
         m_type = VMUndefined;
     } else {
-        std::cout << "Unhandle type in packet from" << std::endl;
+        PLOG(plog::info) << "Unhandle type in packet from";
     }
 out:
     return m_type;
@@ -132,7 +133,7 @@ PacketType VMPacket::from(v8::Local<v8::Value> value) {
             size_t len = 3 * string->Length() + 1;
             if (len >= (m_capacity - 1)) {
                 //ToDo
-                std::cout << "to handle this error" << std::endl;
+                PLOG(plog::info) << "to handle this error";
                 goto out;
             }
             const int flags = v8::String::NO_NULL_TERMINATION | v8::String::REPLACE_INVALID_UTF8;
@@ -146,7 +147,7 @@ PacketType VMPacket::from(v8::Local<v8::Value> value) {
         auto contents = ab->GetContents();
         if (view->ByteLength() >= (m_capacity - 1)) {
             //ToDo
-            std::cout << "to handle this error" << std::endl;
+            PLOG(plog::info) << "to handle this error";
             goto out;
         }
         auto srcData = reinterpret_cast<uint8_t*>(contents.Data()) + view->ByteOffset();
@@ -155,8 +156,11 @@ PacketType VMPacket::from(v8::Local<v8::Value> value) {
         m_type = HostArrayBufferView;
     } else if (value->IsUndefined()) {
         m_type = HostUndefined;
+    } else if (value->IsNativeError()) {
+        m_type = HostError;
+        m_length = sprintf((char*)m_pData, "{\"error\": \"Exception\"}");
     } else {
-        std::cout << "Unsupported type" << std::endl;
+        PLOG(plog::info) << "Unsupported type";
     }
 out:
     return m_type;
@@ -169,7 +173,10 @@ jerry_value_t VMPacket::toJerryValue() const {
         ret = jerry_create_number(m_variantValue.number);
     } else if (m_type == HostBool) {
         ret = jerry_create_boolean(m_variantValue.isTrue);
-    } else if (m_type == HostString || m_type == HostError) {
+    } else if (m_type == HostError) {
+        ret = jerry_create_string ((const jerry_char_t *)m_pData);
+        ret = jerry_create_error_from_value(ret, true);
+    } else if (m_type == HostString) {
         ret = jerry_create_string_from_utf8((const jerry_char_t*)m_pData);
     } else if (m_type == HostArrayBufferView) {
         ret = jerry_create_arraybuffer(m_length);
