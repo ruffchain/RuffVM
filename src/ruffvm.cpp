@@ -58,11 +58,11 @@ callbackHandler(const jerry_value_t function_obj,
                 for (jerry_length_t index = 0; index < args_cnt; index++) {
                     auto pPacket = new bridge::VMPacket();
                     pPacket->from(args_p[index]);
+                    params.push_back(pPacket);
                     if (pPacket->type() == bridge::PacketFailToParse) {
 				        ret_val = jerry_create_undefined();
 				        goto clean;
 			        }
-                    params.push_back(pPacket);
                 }
             } else {
                 auto pPacket = new bridge::VMPacket();
