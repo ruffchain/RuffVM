@@ -46,9 +46,9 @@ callbackHandler(const jerry_value_t function_obj,
     jerry_char_t str_buf_p[RUFFVM_MAX_FUNC_NAME_SIZE + 1] = { 0 };
     jerry_value_t ret_val;
     Result func_name;
+    bridge::VMPackets params;
 
     if (jerry_value_is_string(prop_value)) {
-        bridge::VMPackets params;
         func_name = ruffvm_jerry_string_value_to_string(prop_value,
                                                         (const char*)str_buf_p,
                                                         RUFFVM_MAX_FUNC_NAME_SIZE);
@@ -75,11 +75,6 @@ callbackHandler(const jerry_value_t function_obj,
             jerry_context_t *ctx = jerry_port_get_current_context();
             auto pVMPacket = cbCache.doCallbackToV8(ctx, callbackName, params);
 
-            for (auto iter = params.begin(); iter != params.end(); iter++) {
-	            delete(*iter);
-                *iter = nullptr;
-            }
-
             if (pVMPacket) {
                 ret_val = pVMPacket->toJerryValue();
             } else {
@@ -95,6 +90,11 @@ callbackHandler(const jerry_value_t function_obj,
     }
 
 clean:
+    for (auto iter = params.begin(); iter != params.end(); iter++) {
+        delete(*iter);
+        *iter = nullptr;
+    }
+
     // do clean here
     jerry_release_value(prop_name);
     jerry_release_value(prop_value);
