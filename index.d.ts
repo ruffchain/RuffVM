@@ -5,4 +5,5 @@ export class Script {
     runAsync(): Promise<void>;
 }
 
-export function createScript(type: string): Script
+export function createScript(type: string): Script;
+export function resolveHelper(resolve: any, timeoutMs: number| undefined): (value:any) => void;
